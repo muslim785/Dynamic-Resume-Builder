@@ -156,15 +156,17 @@
     }
   </style>
 </head>
-
 <body>
+
   <div class="container">
     <h1>Responsive Resume Builder</h1>
     <form id="resumeForm">
+      <!-- Image Upload -->
       <label for="profilePicture">Upload Profile Picture:</label>
       <input type="file" id="profilePicture" accept="image/*">
       <img id="profilePreview" alt="Profile Preview">
 
+      <!-- User Details -->
       <label for="name">Full Name:</label>
       <input type="text" id="name" placeholder="Enter your full name" required>
 
@@ -188,7 +190,6 @@
 
     <div id="resumeOutput"></div>
     <button id="download">Download PDF</button>
-    <p id="shareableLink" style="margin-top: 20px;"></p>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -219,28 +220,6 @@
       const skills = document.getElementById('skills').value;
       const experience = document.getElementById('experience').value;
 
-      // Unique Path
-      const uniqueID = 'resume-' + Date.now(); // Use timestamp as unique ID
-      const resumeData = {
-        name,
-        email,
-        phone,
-        education,
-        skills,
-        experience,
-        profileImageBase64,
-      };
-
-      // Save to localStorage
-      localStorage.setItem(uniqueID, JSON.stringify(resumeData));
-
-      // Create a Shareable Link
-      const shareableURL = `${window.location.origin}${window.location.pathname}?id=${uniqueID}`;
-      document.getElementById('shareableLink').innerHTML = `
-        Shareable Link: <a href="${shareableURL}" target="_blank">${shareableURL}</a>
-      `;
-
-      // Show Preview
       let resumeHTML = `
         ${profileImageBase64 ? `<img src="${profileImageBase64}" style="width: 100px; border-radius: 50%;">` : ''}
         <h1>${name}</h1>
@@ -253,56 +232,28 @@
         <h2>Experience</h2>
         <p>${experience.replace(/\n/g, '<br>')}</p>
       `;
+
       document.getElementById('resumeOutput').innerHTML = resumeHTML;
       document.getElementById('resumeOutput').style.display = 'block';
       document.getElementById('download').style.display = 'block';
     });
-
-    // Load Resume from URL
-    window.onload = function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      const resumeID = urlParams.get('id');
-
-      if (resumeID) {
-        const resumeData = JSON.parse(localStorage.getItem(resumeID));
-        if (resumeData) {
-          const { name, email, phone, education, skills, experience, profileImageBase64 } = resumeData;
-
-          // Populate the Resume Preview
-          let resumeHTML = `
-            ${profileImageBase64 ? `<img src="${profileImageBase64}" style="width: 100px; border-radius: 50%;">` : ''}
-            <h1>${name}</h1>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Phone:</strong> ${phone}</p>
-            <h2>Education</h2>
-            <p>${education.replace(/\n/g, '<br>')}</p>
-            <h2>Skills</h2>
-            <p>${skills.replace(/\n/g, '<br>')}</p>
-            <h2>Experience</h2>
-            <p>${experience.replace(/\n/g, '<br>')}</p>
-          `;
-          document.getElementById('resumeOutput').innerHTML = resumeHTML;
-          document.getElementById('resumeOutput').style.display = 'block';
-        } else {
-          alert('Resume not found!');
-        }
-      }
-    };
 
     // Download PDF
     document.getElementById('download').addEventListener('click', function () {
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF();
 
-      const name = document.getElementById('name').value;
-      pdf.setFont('helvetica', 'bold').setFontSize(20).text(name, 10, 20);
-
+      let y = 20;
       if (profileImageBase64) {
-        pdf.addImage(profileImageBase64, 'JPEG', 10, 30, 40, 40);
+        pdf.addImage(profileImageBase64, 'JPEG', 10, y, 40, 40); // Smaller size in PDF
+        y += 50;
       }
-
+      const name = document.getElementById('name').value;
+      pdf.setFont('helvetica', 'bold').setFontSize(20).text(name, 10, y);
+      y += 10;
       pdf.save('resume.pdf');
     });
   </script>
+
 </body>
 </html>
