@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> Resume Builder</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Resetting default styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Body styling */
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #4caf50, #2196f3);
+      color: #fff;
+      padding: 20px;
+      animation: fadeIn 1.5s ease;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      color: #333;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+      animation: slideUp 1s ease;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 36px;
+      margin-bottom: 20px;
+      color: #4caf50;
+    }
+
+    label {
+      font-size: 18px;
+      font-weight: bold;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input[type="text"], textarea, input[type="file"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus, textarea:focus, input[type="file"]:focus {
+      border-color: #4caf50;
+    }
+
+    textarea {
+      resize: none;
+      height: 120px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #profilePreview {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid #4caf50;
+      margin: 0 auto;
+      display: block;
+      display: none;
+      animation: fadeIn 1s ease;
+    }
+
+    #resumeOutput {
+      margin-top: 30px;
+      padding: 25px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      display: none;
+      color: #333;
+    }
+
+    #download {
+      margin-top: 20px;
+      padding: 12px 30px;
+      background-color: #2196f3;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: none;
+    }
+
+    #download:hover {
+      background-color: #0b7dda;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 28px;
+      }
+
+      input[type="text"], textarea, button {
+        font-size: 14px;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      0% {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Responsive Resume Builder</h1>
+    <form id="resumeForm">
+      <!-- Image Upload -->
+      <label for="profilePicture">Upload Profile Picture:</label>
+      <input type="file" id="profilePicture" accept="image/*">
+      <img id="profilePreview" alt="Profile Preview">
+
+      <!-- User Details -->
+      <label for="name">Full Name:</label>
+      <input type="text" id="name" placeholder="Enter your full name" required>
+
+      <label for="email">Email:</label>
+      <input type="text" id="email" placeholder="Enter your email" required>
+
+      <label for="phone">Phone:</label>
+      <input type="text" id="phone" placeholder="Enter your phone number" required>
+
+      <label for="education">Education:</label>
+      <textarea id="education" placeholder="Enter your education details"></textarea>
+
+      <label for="skills">Skills:</label>
+      <textarea id="skills" placeholder="Enter your skills"></textarea>
+
+      <label for="experience">Experience:</label>
+      <textarea id="experience" placeholder="Enter your work experience"></textarea>
+
+      <button type="button" id="generate">Generate Resume</button>
+    </form>
+
+    <div id="resumeOutput"></div>
+    <button id="download">Download PDF</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    let profileImageBase64 = '';
+
+    // Handle image upload
+    document.getElementById('profilePicture').addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          profileImageBase64 = e.target.result;
+          const profilePreview = document.getElementById('profilePreview');
+          profilePreview.src = profileImageBase64;
+          profilePreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Generate Resume
+    document.getElementById('generate').addEventListener('click', function () {
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+      const education = document.getElementById('education').value;
+      const skills = document.getElementById('skills').value;
+      const experience = document.getElementById('experience').value;
+
+      let resumeHTML = `
+        ${profileImageBase64 ? `<img src="${profileImageBase64}" style="width: 100px; border-radius: 50%;">` : ''}
+        <h1>${name}</h1>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <h2>Education</h2>
+        <p>${education.replace(/\n/g, '<br>')}</p>
+        <h2>Skills</h2>
+        <p>${skills.replace(/\n/g, '<br>')}</p>
+        <h2>Experience</h2>
+        <p>${experience.replace(/\n/g, '<br>')}</p>
+      `;
+
+      document.getElementById('resumeOutput').innerHTML = resumeHTML;
+      document.getElementById('resumeOutput').style.display = 'block';
+      document.getElementById('download').style.display = 'block';
+    });
+
+    // Download PDF
+    document.getElementById('download').addEventListener('click', function () {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+
+      let y = 20;
+      if (profileImageBase64) {
+        pdf.addImage(profileImageBase64, 'JPEG', 10, y, 40, 40); // Smaller size in PDF
+        y += 50;
+      }
+      const name = document.getElementById('name').value;
+      pdf.setFont('helvetica', 'bold').setFontSize(20).text(name, 10, y);
+      y += 10;
+      pdf.save('resume.pdf');
+    });
+  </script>
+
+</body>
+</html>
