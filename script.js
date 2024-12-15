@@ -1,3 +1,39 @@
+// Save to localStorage
+function saveToLocalStorage() {
+  const formData = {
+    name: document.getElementById('name').value,
+    email: document.getElementById('email').value,
+    phone: document.getElementById('phone').value,
+    education: document.getElementById('education').value,
+    skills: document.getElementById('skills').value,
+    experience: document.getElementById('experience').value,
+  };
+  localStorage.setItem('resumeData', JSON.stringify(formData));
+}
+
+// Load from localStorage
+function loadFromLocalStorage() {
+  const savedData = localStorage.getItem('resumeData');
+  if (savedData) {
+    const formData = JSON.parse(savedData);
+    document.getElementById('name').value = formData.name || '';
+    document.getElementById('email').value = formData.email || '';
+    document.getElementById('phone').value = formData.phone || '';
+    document.getElementById('education').value = formData.education || '';
+    document.getElementById('skills').value = formData.skills || '';
+    document.getElementById('experience').value = formData.experience || '';
+  }
+}
+
+// Clear localStorage
+document.getElementById('clearData').addEventListener('click', function () {
+  localStorage.removeItem('resumeData');
+  document.getElementById('resumeForm').reset();
+  document.getElementById('resumeOutput').innerHTML = '';
+  document.getElementById('download').style.display = 'none';
+});
+
+// Generate Resume
 document.getElementById('generate').addEventListener('click', function () {
   const name = document.getElementById('name').value;
   const email = document.getElementById('email').value;
@@ -22,42 +58,10 @@ document.getElementById('generate').addEventListener('click', function () {
   document.getElementById('download').style.display = 'inline-block';
 });
 
-document.getElementById('download').addEventListener('click', function () {
-  const name = document.getElementById('name').value;
-  const email = document.getElementById('email').value;
-  const phone = document.getElementById('phone').value;
-  const education = document.getElementById('education').value;
-  const skills = document.getElementById('skills').value;
-  const experience = document.getElementById('experience').value;
-
-  const pdf = new jspdf.jsPDF();
-
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(24);
-  pdf.text(name, 10, 20);
-
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(12);
-  pdf.text(`Email: ${email}`, 10, 30);
-  pdf.text(`Phone: ${phone}`, 10, 40);
-
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(16);
-  pdf.text("Education", 10, 50);
-  pdf.setFont("helvetica", "normal");
-  pdf.text(education.split('\n'), 10, 60);
-
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(16);
-  pdf.text("Skills", 10, 80);
-  pdf.setFont("helvetica", "normal");
-  pdf.text(skills.split('\n'), 10, 90);
-
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(16);
-  pdf.text("Experience", 10, 110);
-  pdf.setFont("helvetica", "normal");
-  pdf.text(experience.split('\n'), 10, 120);
-
-  pdf.save("resume.pdf");
+// Attach input event listeners for saving
+document.querySelectorAll('#resumeForm input, #resumeForm textarea').forEach(input => {
+  input.addEventListener('input', saveToLocalStorage);
 });
+
+// Load saved data on page load
+window.addEventListener('DOMContentLoaded', loadFromLocalStorage);
