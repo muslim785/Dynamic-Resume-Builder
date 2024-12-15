@@ -76,7 +76,6 @@ button:hover {
 button.danger {
   background-color: #f44336;
   color: white;
-  margin-top: 20px;
 }
 
 button.danger:hover {
