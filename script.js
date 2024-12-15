@@ -58,31 +58,61 @@ document.getElementById('download').addEventListener('click', function () {
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
 
+  // Set common variables
+  const leftMargin = 10;
+  const lineHeight = 10;
+  let yPosition = 20;
+
   const name = document.getElementById('name').value;
-  pdf.setFont('helvetica', 'bold').setFontSize(20).text(name, 10, 20);
-
-  if (profileImageBase64) {
-    pdf.addImage(profileImageBase64, 'JPEG', 10, 30, 40, 40);
-  }
-
   const email = document.getElementById('email').value;
   const phone = document.getElementById('phone').value;
   const education = document.getElementById('education').value;
   const skills = document.getElementById('skills').value;
   const experience = document.getElementById('experience').value;
 
+  // Add Name and Profile Picture
+  pdf.setFont('helvetica', 'bold').setFontSize(20).text(name, leftMargin, yPosition);
+  if (profileImageBase64) {
+    pdf.addImage(profileImageBase64, 'JPEG', leftMargin, yPosition + 10, 40, 40);
+    yPosition += 50; // Adjust for profile image height
+  } else {
+    yPosition += 10;
+  }
+
+  // Add Contact Info
   pdf.setFont('helvetica', 'normal').setFontSize(12);
-  pdf.text(`Email: ${email}`, 10, 80);
-  pdf.text(`Phone: ${phone}`, 10, 90);
+  pdf.text(`Email: ${email}`, leftMargin, yPosition);
+  yPosition += lineHeight;
+  pdf.text(`Phone: ${phone}`, leftMargin, yPosition);
+  yPosition += lineHeight + 5;
 
-  pdf.text('Education:', 10, 110);
-  pdf.text(education, 10, 120);
+  // Add Education Section
+  pdf.setFont('helvetica', 'bold').setFontSize(14).text('Education', leftMargin, yPosition);
+  yPosition += lineHeight;
+  pdf.setFont('helvetica', 'normal').setFontSize(12);
+  pdf.text(education, leftMargin, yPosition, { maxWidth: 190 }); // Auto-wrap text
+  yPosition += pdf.getTextDimensions(education).h + 5;
 
-  pdf.text('Skills:', 10, 140);
-  pdf.text(skills, 10, 150);
+  // Add Skills Section
+  pdf.setFont('helvetica', 'bold').setFontSize(14).text('Skills', leftMargin, yPosition);
+  yPosition += lineHeight;
+  pdf.setFont('helvetica', 'normal').setFontSize(12);
+  pdf.text(skills, leftMargin, yPosition, { maxWidth: 190 }); // Auto-wrap text
+  yPosition += pdf.getTextDimensions(skills).h + 5;
 
-  pdf.text('Experience:', 10, 170);
-  pdf.text(experience, 10, 180);
+  // Add Experience Section
+  pdf.setFont('helvetica', 'bold').setFontSize(14).text('Experience', leftMargin, yPosition);
+  yPosition += lineHeight;
+  pdf.setFont('helvetica', 'normal').setFontSize(12);
+  pdf.text(experience, leftMargin, yPosition, { maxWidth: 190 }); // Auto-wrap text
+  yPosition += pdf.getTextDimensions(experience).h + 5;
 
+  // Add a Footer if Page Overflow
+  if (yPosition > 280) {
+    pdf.addPage();
+    yPosition = 20; // Reset yPosition for new page
+  }
+
+  // Save the PDF
   pdf.save('resume.pdf');
 });
