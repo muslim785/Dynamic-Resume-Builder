@@ -58,7 +58,7 @@ document.getElementById('download').addEventListener('click', function () {
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
 
-  // Set common variables
+  // Set margins and line height
   const leftMargin = 10;
   const lineHeight = 10;
   let yPosition = 20;
@@ -74,7 +74,7 @@ document.getElementById('download').addEventListener('click', function () {
   pdf.setFont('helvetica', 'bold').setFontSize(20).text(name, leftMargin, yPosition);
   if (profileImageBase64) {
     pdf.addImage(profileImageBase64, 'JPEG', leftMargin, yPosition + 10, 40, 40);
-    yPosition += 50; // Adjust for profile image height
+    yPosition += 50;
   } else {
     yPosition += 10;
   }
@@ -90,27 +90,34 @@ document.getElementById('download').addEventListener('click', function () {
   pdf.setFont('helvetica', 'bold').setFontSize(14).text('Education', leftMargin, yPosition);
   yPosition += lineHeight;
   pdf.setFont('helvetica', 'normal').setFontSize(12);
-  pdf.text(education, leftMargin, yPosition, { maxWidth: 190 }); // Auto-wrap text
+  pdf.text(education, leftMargin, yPosition, { maxWidth: 190 });
   yPosition += pdf.getTextDimensions(education).h + 5;
 
   // Add Skills Section
   pdf.setFont('helvetica', 'bold').setFontSize(14).text('Skills', leftMargin, yPosition);
   yPosition += lineHeight;
   pdf.setFont('helvetica', 'normal').setFontSize(12);
-  pdf.text(skills, leftMargin, yPosition, { maxWidth: 190 }); // Auto-wrap text
+  pdf.text(skills, leftMargin, yPosition, { maxWidth: 190 });
   yPosition += pdf.getTextDimensions(skills).h + 5;
 
   // Add Experience Section
   pdf.setFont('helvetica', 'bold').setFontSize(14).text('Experience', leftMargin, yPosition);
   yPosition += lineHeight;
   pdf.setFont('helvetica', 'normal').setFontSize(12);
-  pdf.text(experience, leftMargin, yPosition, { maxWidth: 190 }); // Auto-wrap text
+  pdf.text(experience, leftMargin, yPosition, { maxWidth: 190 });
   yPosition += pdf.getTextDimensions(experience).h + 5;
 
-  // Add a Footer if Page Overflow
-  if (yPosition > 280) {
+  // Add Bottom Padding
+  yPosition += 20; // Extra space at the bottom
+
+  // Add Footer (Optional)
+  if (yPosition < 280) { // Adjust if content fits on a single page
+    pdf.setFont('helvetica', 'italic').setFontSize(10);
+    pdf.text('Generated using Resume Builder', leftMargin, yPosition + 10);
+  } else {
     pdf.addPage();
-    yPosition = 20; // Reset yPosition for new page
+    pdf.setFont('helvetica', 'italic').setFontSize(10);
+    pdf.text('Generated using Resume Builder', leftMargin, 20);
   }
 
   // Save the PDF
