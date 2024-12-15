@@ -24,24 +24,6 @@ document.getElementById('generate').addEventListener('click', function () {
   const skills = document.getElementById('skills').value;
   const experience = document.getElementById('experience').value;
 
-  const uniqueID = 'resume-' + Date.now();
-  const resumeData = {
-    name,
-    email,
-    phone,
-    education,
-    skills,
-    experience,
-    profileImageBase64,
-  };
-
-  localStorage.setItem(uniqueID, JSON.stringify(resumeData));
-
-  const shareableURL = `${window.location.origin}${window.location.pathname}?id=${uniqueID}`;
-  document.getElementById('shareableLink').innerHTML = `
-    Shareable Link: <a href="${shareableURL}" target="_blank">${shareableURL}</a>
-  `;
-
   let resumeHTML = `
     ${profileImageBase64 ? `<img src="${profileImageBase64}" style="width: 100px; border-radius: 50%;">` : ''}
     <h1>${name}</h1>
@@ -65,8 +47,8 @@ document.getElementById('clearData').addEventListener('click', function () {
     document.getElementById('resumeForm').reset();
     document.getElementById('profilePreview').style.display = 'none';
     document.getElementById('resumeOutput').style.display = 'none';
-    document.getElementById('shareableLink').innerHTML = '';
     document.getElementById('download').style.display = 'none';
+    document.getElementById('shareableLink').innerHTML = '';
     profileImageBase64 = '';
   }
 });
@@ -96,4 +78,11 @@ document.getElementById('download').addEventListener('click', function () {
   pdf.text('Education:', 10, 110);
   pdf.text(education, 10, 120);
 
-  pdf.text('Skills:', 10
+  pdf.text('Skills:', 10, 140);
+  pdf.text(skills, 10, 150);
+
+  pdf.text('Experience:', 10, 170);
+  pdf.text(experience, 10, 180);
+
+  pdf.save('resume.pdf');
+});
